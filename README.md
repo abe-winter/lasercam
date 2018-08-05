@@ -4,7 +4,7 @@ This is a JS library for scanning barcodes, intented for grabbing barcodes from 
 
 I wrote this a while ago for a project and am open sourcing it in case it's useful to others.
 
-IIRC this takes like 10ms to scan a barcode on my laptop and is performant on mobile.
+IIRC this takes like 10ms per frame on my laptop and is performant on mobile.
 
 ## files
 
