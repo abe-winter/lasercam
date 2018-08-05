@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>lasercam testbed</title>
+</head>
+<body>
+Attention: you may have to launch <pre>chromium-browser --allow-file-access-from-files --allow-file-access --allow-cross-origin-auth-prompt</pre>
+Otherwise cors breaks.
+<br>
+<canvas id="a"></canvas>
+<canvas id="c"></canvas>
+<br>
+<canvas id="b" style="display:none"></canvas>
+<script type="text/javascript" src="dist/lasercam.js"></script>
+<script type="text/javascript">
+  const canvas = document.querySelector('#b');
+  const img = new Image;
+  img.src = "./test-images/flat/barcode.png";
+  img.onload = () => {
+    canvas.width = img.width;
+    canvas.height = img.height;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0);
+    const mid = Math.round(img.height / 2);
+    const data = ctx.getImageData(0, mid - 2, img.width, 5);
+    const c2 = document.querySelector('#a');
+    const ctx2 = c2.getContext('2d');
+    c2.width = data.width;
+    c2.height = data.height;
+    ctx2.putImageData(data, 0, 0);
+    const line = lasercam.collapseLines(lasercam.grayout(data));
+    const canvas_c = document.querySelector('canvas#c');
+    const cc = canvas_c.getContext('2d');
+    canvas_c.width = c2.width;
+    canvas_c.height = c2.height;
+    const line2 = lasercam.smoothThresh(line, 100, 0.9);
+    for (let h=0;h<data.height;h++) {
+      for (let i=0;i<line2.length;i++) {
+        for (let j=0;j<3;j++) {
+          data.data[h * 4 * line2.length + 4*i + j] = line2[i] ? 255 : 0; //  > thresh ? 255 : 0;
+        data.data[h * 4 * line2.length + 4*i + 3] = 255;
+        }
+      }
+    }
+    cc.putImageData(data, 0, 0);
+    const p = document.createElement('p');
+    const t0 = new Date;
+    const ret = lasercam.lineToBarcode(line);
+    p.textContent = `${JSON.stringify(ret)} (elapsed ${new Date - t0} ms)`;
+    document.body.appendChild(p);
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+*.pyc
+test-images/
+training/
+package-lock.json
+node_modules/
+dist/
